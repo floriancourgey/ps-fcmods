@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>fcmods</name>
+	<displayName><![CDATA[FC mods]]></displayName>
+	<version><![CDATA[1.0.0]]></version>
+	<description><![CDATA[Provides overrides, shortcuts and helpers for Prestashop front and back office]]></description>
+	<author><![CDATA[Florian Courgey]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+</module>

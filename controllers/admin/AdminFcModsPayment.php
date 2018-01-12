@@ -71,6 +71,15 @@ class AdminFcModsPaymentController extends ModuleAdminController{
       }
       $info .= '</p></div>';
       $this->content .= $info;
+
+      $payment_methods = array(); // taken from https://github.com/PrestaShop/PrestaShop/blob/develop/controllers/admin/AdminOrdersController.php#L1742
+      foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
+          $module = Module::getInstanceByName($payment['name']);
+          if (Validate::isLoadedObject($module) && $module->active) {
+              $payment_methods[] = ['key'=>$module->displayName, 'name'=>$module->displayName];
+          }
+      }
+
       $this->fields_form = [
           'legend' => [
               'title' => $this->l('FC mods orders'),
@@ -84,9 +93,20 @@ class AdminFcModsPaymentController extends ModuleAdminController{
                   'required' => true,
               ],
               [
-                  'name' => 'reference',
+                  'name' => 'order_reference',
                   'type' => 'text',
-                  'label' => $this->trans('Reference', [], 'Admin.Global'),
+                  'label' => $this->trans('Reference', [], 'Admin.Global').' '.$this->trans('Order', [], 'Admin.Global'),
+                  'required' => true,
+              ],
+              [
+                  'name' => 'payment_method',
+                  'type' => 'select',
+                  'options' => [
+                    'query'=> $payment_methods,
+                    'id' => 'key',
+                    'name' => 'name',
+                  ],
+                  'label' => $this->trans('Method', [], 'Admin.Global').' '.$this->trans('Payment', [], 'Admin.Global'),
                   'required' => true,
               ],
           ],

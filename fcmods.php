@@ -35,6 +35,7 @@ class Fcmods extends Module
       'order'=>'AdminFcModsOrder',
       'invoice'=>'AdminFcModsInvoice',
       'payment'=>'AdminFcModsPayment',
+      'order_state'=>'AdminFcModsOrderState',
     ];
 
     public function __construct()
@@ -92,35 +93,58 @@ class Fcmods extends Module
         Tab::initAccess($tab->id);
       }
 */
-      $tabRoot = new Tab();
-      $tabRoot->active = 1;
-      $tabRoot->class_name = $this->tabs['order'];
-      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
-      $tabRoot->module = $this->name;
-      foreach ($languages as $lang){
-        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods').' '.$this->l('orders');
-      }
-      $tabRoot->save();
+      // $tabRoot = new Tab();
+      // $tabRoot->active = 1;
+      // $tabRoot->class_name = $this->tabs['order'];
+      // $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
+      // $tabRoot->module = $this->name;
+      // foreach ($languages as $lang){
+      //   $tabRoot->name[$lang['id_lang']] = $this->l('FC mods');
+      // }
+      // $tabRoot->save();
 
-      $tabRoot = new Tab();
-      $tabRoot->active = 1;
-      $tabRoot->class_name = $this->tabs['invoice'];
-      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
-      $tabRoot->module = $this->name;
-      foreach ($languages as $lang){
-        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods invoices');
-      }
-      $tabRoot->save();
+      // $tabsParentId = $tabRoot->id;
+      $tabsParentId = Tab::getIdFromClassName('CONFIGURE');
 
-      $tabRoot = new Tab();
-      $tabRoot->active = 1;
-      $tabRoot->class_name = $this->tabs['payment'];
-      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
-      $tabRoot->module = $this->name;
+      $tab = new Tab();
+      $tab->active = 1;
+      $tab->class_name = $this->tabs['order'];
+      $tab->id_parent = $tabsParentId;
+      $tab->module = $this->name;
       foreach ($languages as $lang){
-        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods payments');
+        $tab->name[$lang['id_lang']] = $this->l('FC mods').' '.$this->l('orders');
       }
-      $tabRoot->save();
+      $tab->save();
+
+      $tab1 = new Tab();
+      $tab1->active = 1;
+      $tab1->class_name = $this->tabs['invoice'];
+      $tab1->id_parent = $tabsParentId;
+      $tab1->module = $this->name;
+      foreach ($languages as $lang){
+        $tab1->name[$lang['id_lang']] = $this->l('FC mods invoices');
+      }
+      $tab1->save();
+
+      $tab = new Tab();
+      $tab->active = 1;
+      $tab->class_name = $this->tabs['payment'];
+      $tab->id_parent = $tabsParentId;
+      $tab->module = $this->name;
+      foreach ($languages as $lang){
+        $tab->name[$lang['id_lang']] = $this->l('FC mods payments');
+      }
+      $tab->save();
+
+      $tab = new Tab();
+      $tab->active = 1;
+      $tab->class_name = $this->tabs['order_state'];
+      $tab->id_parent = $tabsParentId;
+      $tab->module = $this->name;
+      foreach ($languages as $lang){
+        $tab->name[$lang['id_lang']] = $this->l('FC mods states');
+      }
+      $tab->save();
 
       return $this->registerHook('header') &&
         $this->registerHook('backOfficeHeader') &&

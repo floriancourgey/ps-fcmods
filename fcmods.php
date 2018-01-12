@@ -69,6 +69,59 @@ class Fcmods extends Module
 
       parent::install();
 
+      $languages = Language::getLanguages(false);
+/*
+      $tabRoot = new Tab();
+      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
+      $tabRoot->module = $this->name;
+      $tabRoot->class_name = 'AdminFcMods';
+      foreach ($languages as $lang){
+        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods');
+      }
+      $tabRoot->save();
+
+      foreach ($this->tabs as $title => $class) {
+        $tab = new Tab();
+        $tab->id_parent = $tabRoot->id;
+        $tab->module = $this->name;
+        $tab->class_name = $class;
+        foreach ($languages as $lang){
+          $tab->name[$lang['id_lang']] = $this->l('FC mods').' '.$this->l($title);
+        }
+        $tab->save();
+        Tab::initAccess($tab->id);
+      }
+*/
+      $tabRoot = new Tab();
+      $tabRoot->active = 1;
+      $tabRoot->class_name = $this->tabs['order'];
+      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
+      $tabRoot->module = $this->name;
+      foreach ($languages as $lang){
+        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods').' '.$this->l('orders');
+      }
+      $tabRoot->save();
+
+      $tabRoot = new Tab();
+      $tabRoot->active = 1;
+      $tabRoot->class_name = $this->tabs['invoice'];
+      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
+      $tabRoot->module = $this->name;
+      foreach ($languages as $lang){
+        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods invoices');
+      }
+      $tabRoot->save();
+
+      $tabRoot = new Tab();
+      $tabRoot->active = 1;
+      $tabRoot->class_name = $this->tabs['payment'];
+      $tabRoot->id_parent = Tab::getIdFromClassName('CONFIGURE');
+      $tabRoot->module = $this->name;
+      foreach ($languages as $lang){
+        $tabRoot->name[$lang['id_lang']] = $this->l('FC mods payments');
+      }
+      $tabRoot->save();
+
       return $this->registerHook('header') &&
         $this->registerHook('backOfficeHeader') &&
         $this->registerHook('displayBackOfficeHeader') &&
@@ -80,6 +133,14 @@ class Fcmods extends Module
     {
         // config
         Configuration::deleteByName('FCMODS_LIVE_MODE');
+        // tabs
+        foreach ($this->tabs as $tabClass) {
+          $id_tab = Tab::getIdFromClassName($tabClass);
+         if ($id_tab) {
+           $tab = new Tab($id_tab);
+           $tab->delete();
+         }
+       }
 
         return parent::uninstall();
     }

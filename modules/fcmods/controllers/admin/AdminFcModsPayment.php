@@ -16,6 +16,13 @@ class AdminFcModsPaymentController extends ModuleAdminController{
       // ';
 
       parent::__construct();
+
+      $this->bulk_actions = [
+  			'delete' => [
+            'text' => $this->l('Delete'),
+            'icon' => 'icon-power-off text-success'
+        ],
+  		];
     }
 
     public function renderList(){

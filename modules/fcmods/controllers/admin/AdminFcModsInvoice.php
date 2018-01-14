@@ -21,6 +21,13 @@ class AdminFcModsInvoiceController extends ModuleAdminController{
       $this->context->smarty->assign(array(
         'hello' => 'Hello World!!!',
   		));
+
+      $this->bulk_actions = [
+  			'delete' => [
+            'text' => $this->l('Delete'),
+            'icon' => 'icon-power-off text-success'
+        ],
+  		];
     }
 
     public function renderList(){

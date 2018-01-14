@@ -16,6 +16,13 @@ class AdminFcModsOrderController extends ModuleAdminController{
       ';
 
       parent::__construct();
+
+      $this->bulk_actions = [
+  			'delete' => [
+            'text' => $this->l('Delete'),
+            'icon' => 'icon-power-off text-success'
+        ],
+  		];
     }
 
     public function renderList(){
@@ -24,15 +31,15 @@ class AdminFcModsOrderController extends ModuleAdminController{
 
       $this->fields_list = [
           'id_order' => ['title' => $this->trans('ID', [], 'Admin.Global'),'class' => 'fixed-width-xs'],
-          'number' => ['title' => $this->trans('Number', [], 'Admin.Global'),'class' => 'fixed-width-xs'],
+          'reference' => ['title' => $this->trans('Order', [], 'Admin.Global'),'class' => 'fixed-width-sm'],
+          'titre' => ['title' => $this->trans('Title', [], 'Admin.Global'), 'type'=>'datetime'],
           'date_add' => ['title' => $this->trans('Date', [], 'Admin.Global'), 'type'=>'datetime'],
           'customer' => ['title' => $this->trans('Customer', [], 'Admin.Global')],
           'total_paid_tax_incl' => ['title' => $this->trans('Total', [], 'Admin.Global'),
             'align' => 'text-right',
             'type' => 'price',
-          'badge_success' => true],
-
-          'reference' => ['title' => $this->trans('Order', [], 'Admin.Global')],
+          'badge_success' => true,
+          'class' => 'fixed-width-sm'],
       ];
 
         $this->addRowAction('edit');
@@ -64,6 +71,11 @@ class AdminFcModsOrderController extends ModuleAdminController{
           ],
           'input' => [
               [
+                  'name' => 'titre',
+                  'type' => 'text',
+                  'label' => 'Titre',
+              ],
+              [
                   'name' => 'date_add',
                   'type' => 'datetime',
                   'label' => $this->trans('Date added', [], 'Admin.Global'),
@@ -75,6 +87,7 @@ class AdminFcModsOrderController extends ModuleAdminController{
                   'label' => $this->trans('Reference', [], 'Admin.Global'),
                   'required' => true,
               ],
+
           ],
           'submit' => [
                 'title' => $this->trans('Save', [], 'Admin.Actions'),

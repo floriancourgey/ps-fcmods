@@ -1,5 +1,5 @@
-modules
-!modules/fcmods
+/modules
+!/modules/fcmods
 .DS_Store
 
 # Created by https://www.gitignore.io/api/prestashop

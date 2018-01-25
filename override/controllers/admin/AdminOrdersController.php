@@ -67,7 +67,57 @@ class AdminOrdersController extends AdminOrdersControllerCore {
   }
 
 	public function postProcess(){
-		// if(!empty($_POST)){
+    // taken from https://github.com/PrestaShop/PrestaShop/blob/develop/controllers/admin/AdminOrdersController.php#L1204
+    if (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')) &&
+            ($module_name = Tools::getValue('payment_module_name')) &&
+            ($id_order_state = Tools::getValue('id_order_state')) && Validate::isModuleName($module_name)) {
+        if ($this->access('edit')) {
+          //check reference
+          // dump(Tools::isSubmit('submitAddOrder'));
+          // unset($_POST['submitAddOrder']);
+          // dump(Tools::isSubmit('submitAddOrder'));
+          // return parent::postProcess();
+          // die();
+          if(empty(Tools::getValue('order_reference'))){
+            // $this->errors[] = $this->trans('The Reference field is invalid.', [], 'Admin.Notifications.Error');
+            // return parent::renderForm();
+          }
+            if (!Configuration::get('PS_CATALOG_MODE')) {
+                $payment_module = Module::getInstanceByName($module_name);
+            } else {
+                $payment_module = new BoOrder();
+            }
+            $cart = new Cart((int)$id_cart);
+            Context::getContext()->currency = new Currency((int)$cart->id_currency);
+            Context::getContext()->customer = new Customer((int)$cart->id_customer);
+            $bad_delivery = false;
+            if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
+                || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
+                if ($bad_delivery) {
+                    $this->errors[] = $this->trans('This delivery address country is not active.', array(), 'Admin.Orderscustomers.Notification');
+                } else {
+                    $this->errors[] = $this->trans('This invoice address country is not active.', array(), 'Admin.Orderscustomers.Notification');
+                }
+            } else {
+                $employee = new Employee((int)Context::getContext()->cookie->id_employee);
+                $result = $payment_module->validateOrder(
+                    (int)$cart->id, (int)$id_order_state,
+                    $cart->getOrderTotal(true, Cart::BOTH), $payment_module->displayName, $this->trans('Manual order -- Employee:', array(), 'Admin.Orderscustomers.Feature').' '.
+                    substr($employee->firstname, 0, 1).'. '.$employee->lastname, array(), null, false, $cart->secure_key
+                );
+                if ($payment_module->currentOrder) {
+                    $reference = Tools::getValue('order_reference');
+                    if(!empty($reference)){
+                        $order = new Order($payment_module->currentOrder);
+                        $order->reference = $reference;
+                        $order->update();
+                    }
+
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token);
+                }
+            }
+        }
+    }
 		// 	dump($this->object);
 		// 	if(Tools::isSubmit('submitAddOrder')){
 		// 		$return = parent::postProcess();

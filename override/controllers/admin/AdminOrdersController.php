@@ -13,14 +13,41 @@ class AdminOrdersController extends AdminOrdersControllerCore {
 
     // $this->_select .= ', address.company as company';
     $this->addRowAction('edit');
+    $this->addRowAction('delete');
     unset($this->fields_list['cname']);
     unset($this->fields_list['new']);
     unset($this->fields_list['payment']);
     unset($this->fields_list['id_pdf']);
+    $this->fields_list['total_paid_tax_incl']['title'] = 'Total TTC facture';
+    $this->fields_list = $this->array_insert_after('company', $this->fields_list, 'total_paid_real', [
+      'title' => $this->trans('Total paye', [], 'Admin.Global'),
+      'type'=>'text',
+      'callback' => 'getTotalPaidReal',
+      'align' => 'text-right',
+    ]);
     $this->fields_list = $this->array_insert_after('reference', $this->fields_list, 'titre', [
       'title' => $this->trans('Title', [], 'Admin.Global'),
       'type'=>'text'
-  ]);
+    ]);
+  }
+
+  public static function getTotalPaidReal($echo, $tr){
+    $order = new Order($tr['id_order']);
+    $invoice = OrderInvoice::getInvoiceByNumber($order->invoice_number);
+    // dump($invoice);
+    // dump((float)$invoice->getTotalPaid());
+    // dump((string)$invoice->getTotalPaid());
+    if($invoice){
+      return Tools::displayPrice((string)$invoice->getTotalPaid(), (int)$order->id_currency);
+    }
+    return '';
+    // dump($echo);
+    // die();
+    // $payments = OrderPayment::getByInvoiceId($order->id_invoice);
+    // dump($payments);die();
+    // return Tools::displayPrice((string)$invoice->getTotalPaid(), (int)$order->id_currency);
+    // return count($payments);
+    // return $order->id_invoice;
   }
 
   public function initPageHeaderToolbar(){

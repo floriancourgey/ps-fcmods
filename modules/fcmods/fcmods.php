@@ -153,6 +153,7 @@ class Fcmods extends Module
         'displayAdminProductsExtra',
         'actionDispatcherBefore',
         'actionDispatcher',
+        'additionalCustomerFormFields',
       ];
 
       foreach ($hooks as $hook) {
@@ -368,9 +369,9 @@ class Fcmods extends Module
         // juste pour le test
         // TODO a l'inscription
         if(!$customer->id_category){
-          $shop = new Shop($customer->id_shop);
-          $customer->id_category = $shop->id_category;
-          $customer->update();
+          // $shop = new Shop($customer->id_shop);
+          // $customer->id_category = $shop->id_category;
+          // $customer->update();
         }
 
         // dump($customer);
@@ -384,8 +385,31 @@ class Fcmods extends Module
       // sinon, on redirige vers la connexion
       // TODO
       // $backTocontroller = $params['controller_class'] ?? '';
-      Tools::redirect('index.php?controller=authentication?back=');
-      die();
+      return Tools::redirect('index.php?controller=authentication?back=');
+    }
+
+    public function hookAdditionalCustomerFormFields($params) {
+      $db = Db::getInstance();
+      $categories = $db->query('select * from '.$db->getPrefix().'category  '); // TODO join name
+      // dump($categories);die();
+      // $values = [];
+      foreach ($categories as $category) {
+        // $values[$category['id_category']] = $category->getName()[0];
+        $values[$category['id_category']] = $category['id_category'];
+      }
+      // TODO join shop
+      return [
+        (new FormField)
+          ->setName('id_category')
+          ->setType('select')
+          ->setAvailableValues($values)
+          ->setRequired(true)
+          ->setLabel($this->l('Ecole')),
+        // (new FormField)
+        //   ->setName('justificatif_upload')
+        //   ->setType('file')
+        //   ->setLabel($this->l('document ID'))
+      ];
     }
 
 }

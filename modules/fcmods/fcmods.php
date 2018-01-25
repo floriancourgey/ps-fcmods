@@ -146,10 +146,27 @@ class Fcmods extends Module
       }
       $tab->save();
 
-      return $this->registerHook('header') &&
-        $this->registerHook('backOfficeHeader') &&
-        $this->registerHook('displayBackOfficeHeader') &&
-        $this->registerHook('displayAdminProductsExtra')
+      $hooks = [
+        'header',
+        'backOfficeHeader',
+        'displayBackOfficeHeader',
+        'displayAdminProductsExtra',
+        'actionDispatcherBefore',
+        'actionDispatcher',
+      ];
+
+      foreach ($hooks as $hook) {
+        $result = $this->registerHook($hook);
+        if(!$result){
+          return $result;
+        }
+      }
+
+      // return $this->registerHook('header') &&
+      //   $this->registerHook('backOfficeHeader') &&
+      //   $this->registerHook('displayBackOfficeHeader') &&
+      //   $this->registerHook('displayAdminProductsExtra') &&
+      //   $this->registerHook('actionDispatcherBefore')
       ;
     }
 
@@ -314,6 +331,61 @@ class Fcmods extends Module
     public function hookDisplayAdminProductsExtra(){
       echo "hookDisplayAdminProductsExtra";
     }
+    public function hookActionDispatcherBefore($params = []){
+      // dump('hookActionDispatcherBefore');
+      // dump($params);
+      // die();
+    }
 
+    public function hookActionDispatcher($params = []){
+      // dump('hookActionDispatcher');
+      // dump($params);
+      // die();
+
+      // $db = Db::getInstance();
+      // $res = $db->execute('alter table '.$db->getPrefix().'customer add id_category int null');
+      // dump($res);
+      // $res = $db->execute('create table '.$db->getPrefix().'seances if not exist');
+      // dump($res);
+      // die();
+
+      // TODO test $params['controller_type'] == Dispatcher::FC_FRONT ?
+      // on zappe la connexion client+admin
+      if(isset($params['controller_class'])){
+        $controllerClass = $params['controller_class'];
+        $whitelist = [
+          AuthController::class,
+          AdminLoginController::class,
+          PageNotFoundController::class,
+        ];
+        if(in_array($controllerClass, $whitelist)){
+          return;
+        }
+      }
+      // on zappe si Customer
+      $customer = $this->context->customer;
+      if($customer && $customer->isLogged()){
+        // juste pour le test
+        // TODO a l'inscription
+        if(!$customer->id_category){
+          $shop = new Shop($customer->id_shop);
+          $customer->id_category = $shop->id_category;
+          $customer->update();
+        }
+
+        // dump($customer);
+        return;
+      }
+      // on zappe si Admin
+      $employee = $this->context->employee;
+      if($employee && $employee->isLoggedBack()){
+        return;
+      }
+      // sinon, on redirige vers la connexion
+      // TODO
+      // $backTocontroller = $params['controller_class'] ?? '';
+      Tools::redirect('index.php?controller=authentication?back=');
+      die();
+    }
 
 }

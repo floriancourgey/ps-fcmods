@@ -1,0 +1,6 @@
+parent: classic
+name: fcmods
+display_name: "FC mods' theme"
+version: 1.0.0
+assets:
+  use_parent_assets: true
